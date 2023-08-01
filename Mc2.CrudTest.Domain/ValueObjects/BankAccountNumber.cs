@@ -1,5 +1,4 @@
-﻿
-namespace Mc2.CrudTest.Domain
+﻿namespace Mc2.CrudTest.Domain.ValueObjects
 {
     public class BankAccountNumber
     {
