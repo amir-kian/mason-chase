@@ -1,5 +1,11 @@
+using Mc2.CrudTest.Domain.Entities;
+using Mc2.CrudTest.Domain.Events;
+using Mc2.CrudTest.Domain.Interfaces;
 using Mc2.CrudTest.Infrastructure;
 using Mc2.CrudTest.Presentation.Infrastructure;
+using Mc2.CrudTest.Repository;
+using Mc2.CrudTest.Service;
+using Mc2.CrudTest.Service.Interfaces;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -25,6 +31,14 @@ namespace Mc2.CrudTest.Presentation
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Your API Name", Version = "v1" });
             });
+
+            builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+            builder.Services.AddScoped<ICustomerService, CustomerService>();
+            builder.Services.AddScoped<ICustomerEventHandler, CustomerEventHandler>();
+            builder.Services.AddScoped<IEventDispatcher, EventDispatcher>();
+            builder.Services.AddScoped<IEventRepository<IDomainEvent>, EventRepository>();
+
+
 
             var app = builder.Build();
 

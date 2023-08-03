@@ -8,9 +8,9 @@ namespace Mc2.CrudTest.Domain.Events
     public class CustomerEventHandler : ICustomerEventHandler
     {
         private readonly ILogger<CustomerEventHandler> _logger;
-        private readonly IEventRepository _eventRepository;
+        private readonly IEventRepository<IDomainEvent> _eventRepository;
 
-        public CustomerEventHandler(ILogger<CustomerEventHandler> logger, IEventRepository eventRepository)
+        public CustomerEventHandler(ILogger<CustomerEventHandler> logger, IEventRepository<IDomainEvent> eventRepository)
         {
             _logger = logger;
             _eventRepository = eventRepository;
@@ -20,36 +20,21 @@ namespace Mc2.CrudTest.Domain.Events
         {
             _logger.LogInformation($"Customer {@event.FirstName} {@event.LastName} created with ID {@event.Id}");
 
-            _eventRepository.AddEvent(new Event
-            {
-                EventType = "CustomerCreated",
-                EventData = $"Customer {@event.FirstName} {@event.LastName} created with ID {@event.Id}",
-                CreatedAt = DateTime.Now
-            });
+            _eventRepository.AddEvent(@event);
         }
 
         public void Handle(CustomerUpdatedEvent @event)
         {
             _logger.LogInformation($"Customer {@event.FirstName} {@event.LastName} updated with ID {@event.Id}");
 
-            _eventRepository.AddEvent(new Event
-            {
-                EventType = "CustomerUpdated",
-                EventData = $"Customer {@event.FirstName} {@event.LastName} updated with ID {@event.Id}",
-                CreatedAt = DateTime.Now
-            });
+            _eventRepository.AddEvent(@event);
         }
 
         public void Handle(CustomerDeletedEvent @event)
         {
             _logger.LogInformation($"Customer with ID {@event.Id} deleted");
 
-            _eventRepository.AddEvent(new Event
-            {
-                EventType = "CustomerDeleted",
-                EventData = $"Customer with ID {@event.Id} deleted",
-                CreatedAt = DateTime.Now
-            });
+            _eventRepository.AddEvent(@event);
         }
     }
 }

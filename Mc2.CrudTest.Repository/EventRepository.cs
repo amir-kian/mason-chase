@@ -1,15 +1,11 @@
 ﻿using Mc2.CrudTest.Domain.Entities;
 using Mc2.CrudTest.Domain.Interfaces;
 using Mc2.CrudTest.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Mc2.CrudTest.Repository
 {
-    public class EventRepository : IEventRepository
+    public class EventRepository : IEventRepository<IDomainEvent>
     {
         private readonly AppDbContext _dbContext;
 
@@ -18,13 +14,19 @@ namespace Mc2.CrudTest.Repository
             _dbContext = dbContext;
         }
 
-        public void AddEvent(Event @event)
+        public void AddEvent(IDomainEvent @event)
         {
-            _dbContext.Events.Add(@event);
+            var eventEntity = new Event
+            {
+                EventType = @event.GetType().Name,
+                EventData = JsonConvert.SerializeObject(@event),
+                CreatedAt = DateTime.Now
+            };
+            _dbContext.Events.Add(eventEntity);
             _dbContext.SaveChanges();
         }
 
-        public IEnumerable<Event> GetEvents()
+        public IEnumerable<IDomainEvent> GetEvents()
         {
             return _dbContext.Events;
         }

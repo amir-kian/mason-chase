@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Mc2.CrudTest.Domain.Entities;
 using Mc2.CrudTest.Service.Interfaces;
+using Mc2.CrudTest.Domain.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Mc2.CrudTest.Presentation.Server.Controllers.APIs
 {
@@ -9,13 +11,17 @@ namespace Mc2.CrudTest.Presentation.Server.Controllers.APIs
     public class CustomerController : ControllerBase
     {
         private readonly ICustomerService _customerService;
+        private readonly ILogger<CustomerController> _logger;
 
-        public CustomerController(ICustomerService customerService)
+
+        public CustomerController(ICustomerService customerService, ILogger<CustomerController> logger)
         {
             _customerService = customerService;
+            _logger = logger;
         }
 
         [HttpGet]
+        [ActionName("GetAllCustomers")]
         public IActionResult GetAllCustomers()
         {
             try
@@ -25,12 +31,14 @@ namespace Mc2.CrudTest.Presentation.Server.Controllers.APIs
             }
             catch (Exception ex)
             {
-               
+                _logger.LogError(ex, "An error occurred while retrieving customers.");
                 return StatusCode(500, "An error occurred while retrieving customers.");
             }
         }
 
         [HttpGet("{customerId}")]
+        [ActionName("GetCustomerById")]
+
         public IActionResult GetCustomerById(int customerId)
         {
             try
@@ -44,12 +52,14 @@ namespace Mc2.CrudTest.Presentation.Server.Controllers.APIs
             }
             catch (Exception ex)
             {
-                
+                _logger.LogError(ex, "An error occurred while retrieving the customer.");
                 return StatusCode(500, "An error occurred while retrieving the customer.");
             }
         }
 
         [HttpPost]
+        [ActionName("CreateCustomer")]
+
         public IActionResult CreateCustomer([FromBody] Customer customer)
         {
             try
@@ -61,27 +71,27 @@ namespace Mc2.CrudTest.Presentation.Server.Controllers.APIs
                     return BadRequest(errors);
                 }
 
-        var createdCustomer = _customerService.CreateCustomer(
-          customer.Firstname,
-          customer.Lastname,
-          customer.DateOfBirth,
-          customer.PhoneNumber,
-          customer.Email,
-          customer.BankAccountNumber
-      );
+                var createdCustomer = _customerService.CreateCustomer(
+                  customer.Firstname,
+                  customer.Lastname,
+                  customer.DateOfBirth,
+                  customer.PhoneNumber,
+                  customer.Email,
+                  customer.BankAccountNumber
+              );
 
                 return CreatedAtAction(nameof(GetCustomerById), new { customerId = createdCustomer.Id }, createdCustomer);
             }
             catch (Exception ex)
             {
-                // Log the exception for debugging purposes
-                // logger.LogError(ex, "An error occurred while creating the customer.");
-
+                _logger.LogError(ex, "An error occurred while creating the customer.");
                 return StatusCode(500, "An error occurred while creating the customer.");
             }
         }
 
         [HttpPut("{customerId}")]
+        [ActionName("UpdateCustomer")]
+
         public IActionResult UpdateCustomer(int customerId, [FromBody] Customer customer)
         {
             try
@@ -97,12 +107,14 @@ namespace Mc2.CrudTest.Presentation.Server.Controllers.APIs
             }
             catch (Exception ex)
             {
-               
+                _logger.LogError(ex, "An error occurred while updating the customer.");
                 return StatusCode(500, "An error occurred while updating the customer.");
             }
         }
 
         [HttpDelete("{customerId}")]
+        [ActionName("DeleteCustomer")]
+
         public IActionResult DeleteCustomer(int customerId)
         {
             try
@@ -118,11 +130,9 @@ namespace Mc2.CrudTest.Presentation.Server.Controllers.APIs
             }
             catch (Exception ex)
             {
-                // Log the exception
-                // Return an appropriate error response
+                _logger.LogError(ex, "An error occurred while deleting the customer.");
                 return StatusCode(500, "An error occurred while deleting the customer.");
             }
         }
     }
 }
-
