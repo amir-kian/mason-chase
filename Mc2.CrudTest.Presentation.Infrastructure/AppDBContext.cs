@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Mc2.CrudTest.Domain.Entities;
-
 namespace Mc2.CrudTest.Infrastructure
 {
     public class AppDbContext : DbContext

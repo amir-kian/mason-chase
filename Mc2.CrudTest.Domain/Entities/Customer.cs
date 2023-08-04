@@ -23,9 +23,26 @@ namespace Mc2.CrudTest.Domain.Entities
 
         public void SetContactDetails(PhoneNumber phoneNumber, Email email, BankAccountNumber bankAccountNumber)
         {
-            PhoneNumber = phoneNumber;
-            Email = email;
-            BankAccountNumber = bankAccountNumber;
+            if (phoneNumber != null)
+            {
+                PhoneNumber = phoneNumber;
+            }
+
+            if (email != null)
+            {
+                Email = email;
+            }
+
+            if (bankAccountNumber != null)
+            {
+                BankAccountNumber = bankAccountNumber;
+            }
+        }
+        public void Update(string firstname, string lastname, DateTime dateOfBirth)
+        {
+            Firstname = firstname;
+            Lastname = lastname;
+            DateOfBirth = dateOfBirth;
         }
     }
 }

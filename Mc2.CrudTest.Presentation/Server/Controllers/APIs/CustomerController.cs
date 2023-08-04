@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Mc2.CrudTest.Domain.Entities;
-using Mc2.CrudTest.Service.Interfaces;
-using Mc2.CrudTest.Domain.Events;
-using Microsoft.Extensions.Logging;
+﻿using Azure.Core;
+using Mc2.CrudTest.Core.DTOs;
+using Mc2.CrudTest.Domain.Commands;
+using Mc2.CrudTest.Domain.Queries;
+using Mc2.CrudTest.Domain.ValueObjects;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+
 
 namespace Mc2.CrudTest.Presentation.Server.Controllers.APIs
 {
@@ -10,23 +13,23 @@ namespace Mc2.CrudTest.Presentation.Server.Controllers.APIs
     [ApiController]
     public class CustomerController : ControllerBase
     {
-        private readonly ICustomerService _customerService;
+        private readonly IMediator _mediator;
         private readonly ILogger<CustomerController> _logger;
 
-
-        public CustomerController(ICustomerService customerService, ILogger<CustomerController> logger)
+        public CustomerController(IMediator mediator, ILogger<CustomerController> logger)
         {
-            _customerService = customerService;
+            _mediator = mediator;
             _logger = logger;
         }
 
         [HttpGet]
         [ActionName("GetAllCustomers")]
-        public IActionResult GetAllCustomers()
+        public async Task<IActionResult> GetAllCustomers()
         {
             try
             {
-                var customers = _customerService.GetAllCustomers();
+                var query = new GetAllCustomersQuery();
+                var customers = await _mediator.Send(query);
                 return Ok(customers);
             }
             catch (Exception ex)
@@ -38,16 +41,18 @@ namespace Mc2.CrudTest.Presentation.Server.Controllers.APIs
 
         [HttpGet("{customerId}")]
         [ActionName("GetCustomerById")]
-
-        public IActionResult GetCustomerById(int customerId)
+        public async Task<IActionResult> GetCustomerById(int customerId)
         {
             try
             {
-                var customer = _customerService.GetCustomerById(customerId);
+                var query = new GetCustomerByIdQuery { CustomerId = customerId };
+                var customer = await _mediator.Send(query);
+
                 if (customer == null)
                 {
                     return NotFound($"Customer with ID {customerId} not found.");
                 }
+
                 return Ok(customer);
             }
             catch (Exception ex)
@@ -59,8 +64,7 @@ namespace Mc2.CrudTest.Presentation.Server.Controllers.APIs
 
         [HttpPost]
         [ActionName("CreateCustomer")]
-
-        public IActionResult CreateCustomer([FromBody] Customer customer)
+        public async Task<IActionResult> CreateCustomer([FromBody] CustomerWriteDTO customer)
         {
             try
             {
@@ -71,14 +75,8 @@ namespace Mc2.CrudTest.Presentation.Server.Controllers.APIs
                     return BadRequest(errors);
                 }
 
-                var createdCustomer = _customerService.CreateCustomer(
-                  customer.Firstname,
-                  customer.Lastname,
-                  customer.DateOfBirth,
-                  customer.PhoneNumber,
-                  customer.Email,
-                  customer.BankAccountNumber
-              );
+                var command = new CreateCustomerCommand(customer.Firstname, customer.Lastname, customer.DateOfBirth, customer.PhoneNumber, customer.Email, customer.BankAccountNumber);
+                var createdCustomer = await _mediator.Send(command);
 
                 return CreatedAtAction(nameof(GetCustomerById), new { customerId = createdCustomer.Id }, createdCustomer);
             }
@@ -88,22 +86,22 @@ namespace Mc2.CrudTest.Presentation.Server.Controllers.APIs
                 return StatusCode(500, "An error occurred while creating the customer.");
             }
         }
-
         [HttpPut("{customerId}")]
         [ActionName("UpdateCustomer")]
-
-        public IActionResult UpdateCustomer(int customerId, [FromBody] Customer customer)
+        public async Task<IActionResult> UpdateCustomer(int customerId, [FromBody] CustomerWriteDTO customer)
         {
             try
             {
-                var existingCustomer = _customerService.GetCustomerById(customerId);
-                if (existingCustomer == null)
-                {
-                    return NotFound($"Customer with ID {customerId} not found.");
-                }
+                var bankAccountNumber = new BankAccountNumber(customer.BankAccountNumber);
 
-                _customerService.UpdateCustomer(customerId, customer.Firstname, customer.Lastname, customer.DateOfBirth, customer.PhoneNumber, customer.Email, customer.BankAccountNumber);
+                var command = new UpdateCustomerCommand(customerId, customer.Firstname, customer.Lastname, customer.DateOfBirth, customer.PhoneNumber, customer.Email, bankAccountNumber);
+                await _mediator.Send(command);
+
                 return NoContent();
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
@@ -114,19 +112,18 @@ namespace Mc2.CrudTest.Presentation.Server.Controllers.APIs
 
         [HttpDelete("{customerId}")]
         [ActionName("DeleteCustomer")]
-
-        public IActionResult DeleteCustomer(int customerId)
+        public async Task<IActionResult> DeleteCustomer(int customerId)
         {
             try
             {
-                var existingCustomer = _customerService.GetCustomerById(customerId);
-                if (existingCustomer == null)
-                {
-                    return NotFound($"Customer with ID {customerId} not found.");
-                }
+                var command = new DeleteCustomerCommand(customerId);
+                await _mediator.Send(command);
 
-                _customerService.DeleteCustomer(customerId);
                 return NoContent();
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {

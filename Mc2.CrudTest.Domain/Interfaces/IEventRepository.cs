@@ -2,9 +2,9 @@
 
 namespace Mc2.CrudTest.Domain.Interfaces
 {
-    public interface IEventRepository<TEvent> where TEvent : IDomainEvent
+    public interface IEventRepository<T> where T : IDomainEvent
     {
-        void AddEvent(TEvent @event);
-        IEnumerable<TEvent> GetEvents();
+        Task AddEvent(T @event);
+        Task<IEnumerable<T>> GetEvents();
     }
 }

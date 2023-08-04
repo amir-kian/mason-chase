@@ -16,25 +16,25 @@ namespace Mc2.CrudTest.Domain.Events
             _eventRepository = eventRepository;
         }
 
-        public void Handle(CustomerCreatedEvent @event)
+        public async Task Handle(CustomerCreatedEvent @event)
         {
             _logger.LogInformation($"Customer {@event.FirstName} {@event.LastName} created with ID {@event.Id}");
 
-            _eventRepository.AddEvent(@event);
+            await _eventRepository.AddEvent(@event);
         }
 
-        public void Handle(CustomerUpdatedEvent @event)
+        public async Task Handle(CustomerUpdatedEvent @event)
         {
             _logger.LogInformation($"Customer {@event.FirstName} {@event.LastName} updated with ID {@event.Id}");
 
-            _eventRepository.AddEvent(@event);
+            await _eventRepository.AddEvent(@event);
         }
 
-        public void Handle(CustomerDeletedEvent @event)
+        public async Task Handle(CustomerDeletedEvent @event)
         {
             _logger.LogInformation($"Customer with ID {@event.Id} deleted");
 
-            _eventRepository.AddEvent(@event);
+            await _eventRepository.AddEvent(@event);
         }
     }
 }

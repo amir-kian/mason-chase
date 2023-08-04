@@ -14,7 +14,7 @@ namespace Mc2.CrudTest.Repository
             _dbContext = dbContext;
         }
 
-        public void AddEvent(IDomainEvent @event)
+        public async Task AddEvent(IDomainEvent @event)
         {
             var eventEntity = new Event
             {
@@ -23,12 +23,12 @@ namespace Mc2.CrudTest.Repository
                 CreatedAt = DateTime.Now
             };
             _dbContext.Events.Add(eventEntity);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public IEnumerable<IDomainEvent> GetEvents()
+        public async Task<IEnumerable<IDomainEvent>> GetEvents()
         {
-            return _dbContext.Events;
+            return await Task.FromResult(_dbContext.Events.AsEnumerable());
         }
     }
 }

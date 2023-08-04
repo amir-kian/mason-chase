@@ -10,4 +10,9 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Mc2.CrudTest.Core.csproj" />
+  </ItemGroup>
+
+
 </Project>

@@ -25,16 +25,15 @@ namespace Mc2.CrudTest.Service
 
             _customerRepository.Add(customer);
 
-            var customerCreatedEvent = new CustomerCreatedEvent
-            {
-                Id = customer.Id,
-                FirstName = customer.Firstname,
-                LastName = customer.Lastname,
-                DateOfBirth = customer.DateOfBirth,
-                PhoneNumber = customer.PhoneNumber,
-                Email = customer.Email,
-                BankAccountNumber = customer.BankAccountNumber
-            };
+            var customerCreatedEvent = new CustomerCreatedEvent(
+                customer.Id,
+                customer.Firstname,
+                customer.Lastname,
+                customer.DateOfBirth,
+                customer.PhoneNumber,
+                customer.Email,
+                customer.BankAccountNumber
+            );
             _eventDispatcher.Dispatch(customerCreatedEvent);
 
             return customer;
@@ -61,16 +60,15 @@ namespace Mc2.CrudTest.Service
 
             _customerRepository.Update(customer);
 
-            var customerUpdatedEvent = new CustomerUpdatedEvent
-            {
-                Id = customer.Id,
-                FirstName = customer.Firstname,
-                LastName = customer.Lastname,
-                DateOfBirth = customer.DateOfBirth,
-                PhoneNumber = customer.PhoneNumber,
-                Email = customer.Email,
-                BankAccountNumber = customer.BankAccountNumber
-            };
+            var customerUpdatedEvent = new CustomerUpdatedEvent(
+                customer.Id,
+                customer.Firstname,
+                customer.Lastname,
+                customer.DateOfBirth,
+                customer.PhoneNumber,
+                customer.Email,
+                customer.BankAccountNumber
+            );
 
             _eventDispatcher.Dispatch(customerUpdatedEvent);
         }
@@ -84,15 +82,12 @@ namespace Mc2.CrudTest.Service
             _customerRepository.Delete(customer);
 
             // Create and dispatch the CustomerDeletedEvent
-            var customerDeletedEvent = new CustomerDeletedEvent
-            {
-                Id = customer.Id
-            };
+            var customerDeletedEvent = new CustomerDeletedEvent(customer.Id);
             _eventDispatcher.Dispatch(customerDeletedEvent);
         }
 
 
 
-     
+
     }
 }
