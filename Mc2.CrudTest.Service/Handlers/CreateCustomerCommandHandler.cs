@@ -21,11 +21,11 @@ namespace Mc2.CrudTest.Service.Handlers
 
         public async Task<Customer> Handle(CreateCustomerCommand request, CancellationToken cancellationToken)
         {
-            var customer = new Customer(request.Firstname, request.Lastname, request.DateOfBirth);
             var phoneNumber = new PhoneNumber(request.PhoneNumber);
             var email = new Email(request.Email);
             var bankAccountNumber = new BankAccountNumber(request.BankAccountNumber);
-            customer.SetContactDetails(phoneNumber, email, bankAccountNumber);
+
+            var customer = new Customer(request.Firstname, request.Lastname, request.DateOfBirth, phoneNumber, email, bankAccountNumber);
 
             await _repository.Add(customer);
 

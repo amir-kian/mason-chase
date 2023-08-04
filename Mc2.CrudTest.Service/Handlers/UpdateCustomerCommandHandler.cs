@@ -29,25 +29,20 @@ namespace Mc2.CrudTest.Service.Handlers
 
             customer.Update(request.Firstname, request.Lastname, request.DateOfBirth);
 
-            PhoneNumber phoneNumber = null;
             if (!string.IsNullOrEmpty(request.PhoneNumber))
             {
-                phoneNumber = new PhoneNumber(request.PhoneNumber);
+                customer.PhoneNumber = new PhoneNumber(request.PhoneNumber);
             }
 
-            Email email = null;
             if (!string.IsNullOrEmpty(request.Email))
             {
-                email = new Email(request.Email);
+                customer.Email = new Email(request.Email);
             }
 
-            BankAccountNumber bankAccountNumber = null;
             if (!string.IsNullOrEmpty(request.BankAccountNumber.ToString()))
             {
-                bankAccountNumber = new BankAccountNumber(request.BankAccountNumber.ToString());
+                customer.BankAccountNumber = new BankAccountNumber(request.BankAccountNumber.ToString());
             }
-
-            customer.SetContactDetails(phoneNumber, email, bankAccountNumber);
 
             await _repository.Update(customer);
 

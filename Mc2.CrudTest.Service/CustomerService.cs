@@ -20,8 +20,7 @@ namespace Mc2.CrudTest.Service
 
         public Customer CreateCustomer(string firstName, string lastName, DateTime dateOfBirth, PhoneNumber phoneNumber, Email email, BankAccountNumber bankAccountNumber)
         {
-            var customer = new Customer(firstName, lastName, dateOfBirth);
-            customer.SetContactDetails(phoneNumber, email, bankAccountNumber);
+            var customer = new Customer(firstName, lastName, dateOfBirth, phoneNumber, email, bankAccountNumber);
 
             _customerRepository.Add(customer);
 
@@ -56,7 +55,8 @@ namespace Mc2.CrudTest.Service
             {
                 throw new ArgumentException($"Customer with ID {customerId} does not exist.");
             }
-            customer.SetContactDetails(phoneNumber, email, bankAccountNumber);
+
+            customer.Update(firstName, lastName, dateOfBirth);
 
             _customerRepository.Update(customer);
 
